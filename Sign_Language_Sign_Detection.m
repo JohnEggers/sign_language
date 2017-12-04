@@ -54,6 +54,11 @@ img5 = imread('stop4.jpg');
 img6 = imread('signs1.jpg');
 img7 = imread('signs2.jpg');
 img8 = imread('signs3.jpg');
+%img9 = imread('signs4.jpg');
+img10 = imread('signs5.jpg');
+img11 = imread('signs6.jpg');
+img12 = imread('signs7.jpg');
+%img13 = imread('signs8.jpg');
 
 %%
 % Detect the signs in the image. 
@@ -67,6 +72,11 @@ bbox5 = step(detector,img5);
 bbox6 = step(detector,img6); 
 bbox7 = step(detector,img7); 
 bbox8 = step(detector,img8); 
+%bbox9 = step(detector,img9);
+bbox10 = step(detector,img10);
+bbox11 = step(detector,img11);
+bbox12 = step(detector,img12);
+%bbox13 = step(detector,img13);
 
 %%
 % Insert bounding box rectangles and return the marked image.
@@ -79,6 +89,11 @@ detectedImg5 = insertObjectAnnotation(img5,'rectangle',bbox5,'sign');
 detectedImg6 = insertObjectAnnotation(img6,'rectangle',bbox6,'sign');
 detectedImg7 = insertObjectAnnotation(img7,'rectangle',bbox7,'sign');
 detectedImg8 = insertObjectAnnotation(img8,'rectangle',bbox8,'sign');
+%detectedImg9 = insertObjectAnnotation(img9,'rectangle',bbox9,'sign');
+detectedImg10 = insertObjectAnnotation(img10,'rectangle',bbox10,'sign');
+detectedImg11 = insertObjectAnnotation(img11,'rectangle',bbox11,'sign');
+detectedImg12 = insertObjectAnnotation(img12,'rectangle',bbox12,'sign');
+%detectedImg13 = insertObjectAnnotation(img13,'rectangle',bbox13,'sign');
  
 %%
 % Display the detected stop sign.
@@ -90,6 +105,11 @@ figure; imshow(detectedImg5);
 figure; imshow(detectedImg6);
 figure; imshow(detectedImg7);
 figure; imshow(detectedImg8);
+%figure; imshow(detectedImg9);
+figure; imshow(detectedImg10);
+figure; imshow(detectedImg11);
+figure; imshow(detectedImg12);
+%figure; imshow(detectedImg13);
 
 %%
 % Remove the image directory from the path.
