@@ -1,5 +1,6 @@
 %% Sign Detector - Team Sign Language
 % CS 385
+%
 
 %%
 % Load positive samples.
