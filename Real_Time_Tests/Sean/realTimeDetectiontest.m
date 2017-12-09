@@ -49,13 +49,33 @@ try
 	% Enlarge figure to full screen.
 	set(gcf, 'units','normalized','outerposition',[0 0 1 1]);
 	
+	% Ask user if they want to write the individual frames out to disk.
+	promptMessage = sprintf('Do you want to save the individual frames out to individual disk files?');
+	button = questdlg(promptMessage, 'Save individual frames?', 'Yes', 'No', 'Yes');
+	if strcmp(button, 'Yes')
+		writeToDisk = true;
+		
+		% Extract out the various parts of the filename.
+		[folder, baseFileName, extentions] = fileparts(movieFullFileName);
+		% Make up a special new output subfolder for all the separate
+		% movie frames that we're going to extract and save to disk.
+		% (Don't worry - windows can handle forward slashes in the folder name.)
+		folder = pwd;   % Make it a subfolder of the folder where this m-file lives.
+		outputFolder = sprintf('%s/Movie Frames from %s', folder, baseFileName);
+		% Create the folder if it doesn't exist already.
+		if ~exist(outputFolder, 'dir')
+			mkdir(outputFolder);
+		end
+	else
+		writeToDisk = false;
+	end
 	
 	% Loop through the movie, writing all frames out.
 	% Each frame will be in a separate file with unique name.
-% 	meanGrayLevels = zeros(numberOfFrames, 1);
-% 	meanRedLevels = zeros(numberOfFrames, 1);
-% 	meanGreenLevels = zeros(numberOfFrames, 1);
-% 	meanBlueLevels = zeros(numberOfFrames, 1);
+	meanGrayLevels = zeros(numberOfFrames, 1);
+	meanRedLevels = zeros(numberOfFrames, 1);
+	meanGreenLevels = zeros(numberOfFrames, 1);
+	meanBlueLevels = zeros(numberOfFrames, 1);
 	for frame = 1 : numberOfFrames
 		% Extract the frame from the movie structure.
 		thisFrame = read(videoObject, frame);
@@ -84,7 +104,19 @@ try
 			% actually written into the pixel values.
 			% Write it out to disk.
 			imwrite(frameWithText.cdata, outputFullFileName, 'png');
-        end
+		end
+		
+
+		% Put title back because plot() erases the existing title.
+		title('Mean Gray Levels', 'FontSize', fontSize);
+		if frame == 1
+			xlabel('Frame Number');
+			ylabel('Gray Level');
+			% Get size data later for preallocation if we read
+			% the movie back in from disk.
+			[rows, columns, numberOfColorChannels] = size(thisFrame);
+		end
+		
 		% Update user with the progress.  Display in the command window.
 		if writeToDisk
 			progressIndication = sprintf('Wrote frame %4d of %d.', frame, numberOfFrames);
@@ -114,8 +146,7 @@ try
 		% Threshold with Otsu method.
 		grayImage = rgb2gray(differenceImage); % Convert to gray level
 		thresholdLevel = graythresh(grayImage); % Get threshold.
-        binaryImage = imbinarize(grayImage, thresholdLevel);
-		%binaryImage = im2bw( grayImage, thresholdLevel); % Do the binarization
+		binaryImage = im2bw( grayImage, thresholdLevel); % Do the binarization
         st = regionprops(binaryImage, 'BoundingBox');
         for k = 1 : length(st)
             thisBB = st(k).BoundingBox;
@@ -128,7 +159,19 @@ try
 		title('Binarized Difference Image', 'FontSize', fontSize);
 	end
 	
+	% Alert user that we're done.
+	if writeToDisk
+		finishedMessage = sprintf('Done!  It wrote %d frames to folder\n"%s"', numberOfFramesWritten, outputFolder);
+	else
+		finishedMessage = sprintf('Done!  It processed %d frames of\n"%s"', numberOfFramesWritten, movieFullFileName);
+	end
+	disp(finishedMessage); % Write to command window.
+	uiwait(msgbox(finishedMessage)); % Also pop up a message box.
 	
+	% Exit if they didn't write any individual frames out to disk.
+	if ~writeToDisk
+		return;
+	end
 	
 	% Ask user if they want to read the individual frames from the disk,
 	% that they just wrote out, back into a movie and display it.
